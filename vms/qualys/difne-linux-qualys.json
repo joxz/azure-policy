@@ -1,0 +1,145 @@
+{
+    "policyType": "Custom",
+    "mode": "All",
+    "displayName": "Deploy Qualys Cloud Agent for Linux VMs",
+    "parameters": {
+        "effect": {
+            "type": "String",
+            "metadata": {
+                "displayName": "Effect",
+                "description": "Deploy, Audit, Disabled"
+            },
+            "allowedValues": [
+                "DeployIfNotExists",
+                "AuditIfNotExists",
+                "Disabled"
+            ],
+            "defaultValue": "DeployIfNotExists"
+        },
+        "licensecode": {
+            "type": "String",
+            "metadata": {
+                "displayName": "LicenseCode",
+                "description": "Qualys Licensecode"
+            }
+        },
+        "excludetagname": {
+            "type": "String",
+            "metadata": {
+                "displayname": "Exclusion tag name",
+                "description": "Tag name to exclude from Qualys rollout"
+            },
+            "defaultValue": "noqualysagent"
+        },
+        "excludetagvalue": {
+            "type": "String",
+            "metadata": {
+                "displayname": "Exclusion tag value",
+                "description": "Tag value to exclude from Qualys rollout"
+            },
+            "defaultValue": "true"
+        }
+    },
+    "policyRule": {
+        "if": {
+            "allOf": [
+                {
+                    "field": "type",
+                    "equals": "Microsoft.Compute/virtualMachines"
+                },
+                {
+                    "field": "Microsoft.Compute/virtualMachines/storageProfile.osDisk.osType",
+                    "like": "Linux*"
+                },
+                {
+                    "anyOf": [
+                        {
+                            "field": "[concat('tags[', parameters('excludetagname'), ']')]",
+                            "exists": false
+                        },
+                        {
+                            "field": "[concat('tags[', parameters('excludetagname'), ']')]",
+                            "notEquals": "[parameters('excludetagvalue')]"
+                        }
+                    ]
+                }
+            ]
+        },
+        "then": {
+            "effect": "[parameters('effect')]",
+            "details": {
+                "type": "Microsoft.Compute/virtualMachines/extensions",
+                "name": "QualysAgentLinux",
+                "roleDefinitionIds": [
+                    "/providers/microsoft.authorization/roleDefinitions/9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
+                ],
+                "evaluationDelay": "AfterProvisioning",
+                "existenceCondition": {
+                    "allOf": [
+                        {
+                            "field": "Microsoft.Compute/virtualMachines/extensions/type",
+                            "equals": "QualysAgentLinux"
+                        },
+                        {
+                            "field": "Microsoft.Compute/virtualMachines/extensions/publisher",
+                            "equals": "Qualys"
+                        },
+                        {
+                            "field": "Microsoft.Compute/virtualMachines/extensions/provisioningState",
+                            "equals": "Succeeded"
+                        }
+                    ]
+                },
+                "deployment": {
+                    "properties": {
+                        "mode": "incremental",
+                        "parameters": {
+                            "vmName": {
+                                "value": "[field('name')]"
+                            },
+                            "location": {
+                                "value": "[field('location')]"
+                            },
+                            "licensecode": {
+                                "value": "[parameters('licensecode')]"
+                            }
+                        },
+                        "template": {
+                            "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                            "contentVersion": "1.0.0.0",
+                            "parameters": {
+                                "vmName": {
+                                    "type": "string"
+                                },
+                                "location": {
+                                    "type": "string"
+                                },
+                                "licensecode": {
+                                    "type": "string"
+                                }
+                            },
+                            "resources": [
+                                {
+                                    "apiVersion": "2019-07-01",
+                                    "name": "[concat(parameters('vmName'), '/QualysAgentLinux')]",
+                                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                                    "location": "[parameters('location')]",
+                                    "properties": {
+                                        "publisher": "Qualys",
+                                        "type": "QualysAgentLinux",
+                                        "autoUpgradeMinorVersion": true,
+                                        "typeHandlerVersion": "1.6",
+                                        "settings": {
+                                            "LicenseCode": "[parameters('licensecode')]"
+                                        },
+                                        "protectedSettings": {}
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
