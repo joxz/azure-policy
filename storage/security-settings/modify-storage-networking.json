@@ -1,6 +1,6 @@
 {
     "properties": {
-        "displayName": "Modify storage account network defaults",
+        "displayName": "Modify storage account network settings",
         "description": "Corrects non-compliant storage accounts to have public network access disabled",
         "mode": "Indexed",
         "metadata": {

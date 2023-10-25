@@ -1,6 +1,6 @@
 {
     "properties": {
-        "displayName": "Modify storage account network defaults",
+        "displayName": "Deploy storage account network settings",
         "description": "Corrects non-compliant storage accounts to have public network access disabled",
         "mode": "All",
         "metadata": {
@@ -12,10 +12,11 @@
                 "type": "String",
                 "metadata": {
                     "displayName": "Effect",
-                    "description": "Disabled turns off the policy, DeployIfNotExists corrects the non-compliant resource",
+                    "description": "Disabled turns off the policy. AuditIfNotExists monitors, DeployIfNotExists corrects the non-compliant resource",
                     "portalReview": "true"
                 },
                 "allowedValues": [
+                    "AuditIfNotExists",
                     "DeployIfNotExists",
                     "Disabled"
                 ],
