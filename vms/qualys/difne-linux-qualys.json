@@ -7,7 +7,8 @@
             "type": "String",
             "metadata": {
                 "displayName": "Effect",
-                "description": "Deploy, Audit, Disabled"
+                "description": "Deploy, Audit, Disabled",
+                "portalReview": "true"
             },
             "allowedValues": [
                 "DeployIfNotExists",
@@ -20,14 +21,16 @@
             "type": "String",
             "metadata": {
                 "displayName": "LicenseCode",
-                "description": "Qualys Licensecode"
+                "description": "Qualys Licensecode",
+                "portalReview": "true"
             }
         },
         "excludetagname": {
             "type": "String",
             "metadata": {
                 "displayname": "Exclusion tag name",
-                "description": "Tag name to exclude from Qualys rollout"
+                "description": "Tag name to exclude from Qualys rollout",
+                "portalReview": "true"
             },
             "defaultValue": "noqualysagent"
         },
@@ -35,7 +38,8 @@
             "type": "String",
             "metadata": {
                 "displayname": "Exclusion tag value",
-                "description": "Tag value to exclude from Qualys rollout"
+                "description": "Tag value to exclude from Qualys rollout",
+                "portalReview": "true"
             },
             "defaultValue": "true"
         }
