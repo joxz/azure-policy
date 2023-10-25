@@ -1,0 +1,47 @@
+{
+    "properties": {
+        "displayName": "Denies deletion of AzureFirewalls",
+        "description": "Denies deletion of AzureFirewalls, https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effects#denyaction",
+        "mode": "Indexed",
+        "metadata": {
+            "version": "1.0.0",
+            "category": "Security"
+        },
+        "parameters": {
+            "effectType": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect",
+                    "description": "Disabled turns off the policy, DenyAction prevents deletion of resources",
+                    "portalReview": "true"
+                },
+                "allowedValues": [
+                    "DenyAction",
+                    "Disabled"
+                ],
+                "defaultValue": "Disabled"
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Network/azureFirewalls"
+                    }
+                ]
+            },
+            "then": {
+                "effect": "[parameters('effectType')]",
+                "details": {
+                    "actionNames": [
+                        "delete"
+                    ],
+                    "cascadeBehaviors": {
+                        "resourceGroup": "deny"
+                    }
+                }
+            }
+        }
+    }
+}
