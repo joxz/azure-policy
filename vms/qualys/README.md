@@ -7,6 +7,7 @@ Tag name and value to exclude can be defined in assignment parameters
 
 A valid Qualys license code is required to install the VM extension (has to be set in the assignment parameters)
 
+
 [^1]: [DeployIfNotExists properties](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effects#deployifnotexists-properties)
 
 
