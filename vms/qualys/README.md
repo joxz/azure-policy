@@ -7,9 +7,15 @@ Tag name and value to exclude can be defined in assignment parameters
 
 A valid Qualys license code is required to install the VM extension (has to be set in the assignment parameters)
 
+> [!NOTE]  
+> When the extension is removed manually after deployment, will be reinstalled when the next policy evaluation cycle happens (once every 24h)
 
 [^1]: [DeployIfNotExists properties](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effects#deployifnotexists-properties)
 
+
+``` pwsh
+New-AzPolicyDefinition -Name 'Policyname' -DisplayName 'Displayname of the policy' -Policy './difne-linux-qualys.json'
+```
 
 ## AzCLI 
 
