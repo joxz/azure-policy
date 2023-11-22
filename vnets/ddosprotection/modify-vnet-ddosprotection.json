@@ -39,7 +39,7 @@
                 },
                 "defaultValue": "noddosprotection"
             },
-            "excludetagvalue": {
+            "excludeTagValue": {
                 "type": "String",
                 "metadata": {
                     "displayname": "Exclusion Tag value",
@@ -67,12 +67,12 @@
                     {
                         "anyOf": [
                             {
-                                "field": "[concat('tags[', parameters('excludetagname'), ']')]",
+                                "field": "[concat('tags[', parameters('excludeTagName'), ']')]",
                                 "exists": false
                             },
                             {
-                                "field": "[concat('tags[', parameters('excludetagname'), ']')]",
-                                "notEquals": "[parameters('excludetagvalue')]"
+                                "field": "[concat('tags[', parameters('excludeTagName'), ']')]",
+                                "notEquals": "[parameters('excludeTagValue')]"
                             }
                         ]
                     }
