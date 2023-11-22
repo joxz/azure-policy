@@ -1,0 +1,104 @@
+{
+    "properties": {
+        "displayName": "Modify Vnet DDoS protection settings",
+        "description": "Corrects non-compliant Vnets to have DDoS Protection enforced",
+        "mode": "Indexed",
+        "metadata": {
+            "version": "1.0.0",
+            "category": "Security"
+        },
+        "parameters": {
+            "effectType": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect",
+                    "description": "Disabled turns off the policy, Audit flags non-compliant resources, Modify corrects the non-compliant resource",
+                    "portalReview": "true"
+                },
+                "allowedValues": [
+                    "Audit",
+                    "Modify",
+                    "Disabled"
+                ],
+                "defaultValue": "Audit"
+            },
+            "ddosProtectionPlanId": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "DDoS Protection Plan ID",
+                    "description": "ResourceID of the DDoS Protection Plan",
+                    "portalReview": "true"
+                }
+            },
+            "excludeTagName": {
+                "type": "String",
+                "metadata": {
+                    "displayname": "Exclusion Tag name",
+                    "description": "Tag name to exclude from applying the policy",
+                    "portalReview": "true"
+                },
+                "defaultValue": "noddosprotection"
+            },
+            "excludetagvalue": {
+                "type": "String",
+                "metadata": {
+                    "displayname": "Exclusion Tag value",
+                    "description": "Tag value to exclude from applying the policy",
+                    "portalReview": "true"
+                },
+                "defaultValue": "true"
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Network/virtualNetworks"
+                    },
+                    {
+                        "field": "Microsoft.Network/virtualNetworks/enableDdosProtection",
+                        "notEquals": "true"
+                    },
+                    {
+                        "field": "Microsoft.Network/virtualNetworks/ddosProtectionPlan.id",
+                        "notEquals": "[parameters('ddosProtectionPlanId')]"
+                    },
+                    {
+                        "anyOf": [
+                            {
+                                "field": "[concat('tags[', parameters('excludetagname'), ']')]",
+                                "exists": false
+                            },
+                            {
+                                "field": "[concat('tags[', parameters('excludetagname'), ']')]",
+                                "notEquals": "[parameters('excludetagvalue')]"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "then": {
+                "effect": "[parameters('effectType')]",
+                "details": {
+                    "roleDefinitionIds": [
+                        "/providers/microsoft.authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7"
+                    ],
+                    "conflictEffect": "audit",
+                    "operations": [
+                        {
+                            "operation": "addOrReplace",
+                            "field": "Microsoft.Network/virtualNetworks/enableDdosProtection",
+                            "value": true
+                        },
+                        {
+                            "operation": "addOrReplace",
+                            "field": "Microsoft.Network/virtualNetworks/ddosProtectionPlan.id",
+                            "value": "[parameters('ddosProtectionPlanId')]"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
