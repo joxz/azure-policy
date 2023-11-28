@@ -1,0 +1,104 @@
+{
+    "properties": {
+        "displayName": "Modify Vnet DNS server settings",
+        "description": "Corrects non-compliant Vnets to have the allowed DNS server enforced",
+        "mode": "Indexed",
+        "metadata": {
+            "version": "1.0.0",
+            "category": "Security"
+        },
+        "parameters": {
+            "effectType": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect",
+                    "description": "Disabled turns off the policy, Audit flags non-compliant resources, Modify corrects the non-compliant resource",
+                    "portalReview": "true"
+                },
+                "allowedValues": [
+                    "Audit",
+                    "Modify",
+                    "Disabled"
+                ],
+                "defaultValue": "Audit"
+            },
+            "allowedDns": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Allowed DNS Server",
+                    "description": "The IP address of the allowed DNS Server for Vnets",
+                    "portalReview": "true"
+                },
+                "defaultValue": "1.1.1.1"
+            },
+            "excludeTagName": {
+                "type": "String",
+                "metadata": {
+                    "displayname": "Exclusion Tag name",
+                    "description": "Tag name to exclude from applying the policy",
+                    "portalReview": "true"
+                },
+                "defaultValue": "nodnssettings"
+            },
+            "excludeTagValue": {
+                "type": "String",
+                "metadata": {
+                    "displayname": "Exclusion Tag value",
+                    "description": "Tag value to exclude from applying the policy",
+                    "portalReview": "true"
+                },
+                "defaultValue": "true"
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Network/virtualNetworks"
+                    },
+                    {
+                        "anyOf": [
+                            {
+                                "field": "Microsoft.Network/virtualNetworks/dhcpOptions.dnsServers[*]",
+                                "exists": "false"
+                            },
+                            {
+                                "field": "Microsoft.Network/virtualNetworks/dhcpOptions.dnsServers[*]",
+                                "notEquals": "[parameters('allowedDns')]"
+                            }
+                        ]
+                    },
+                    {
+                        "anyOf": [
+                            {
+                                "field": "[concat('tags[', parameters('excludeTagName'), ']')]",
+                                "exists": false
+                            },
+                            {
+                                "field": "[concat('tags[', parameters('excludeTagName'), ']')]",
+                                "notEquals": "[parameters('excludeTagValue')]"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "then": {
+                "effect": "[parameters('effectType')]",
+                "details": {
+                    "roleDefinitionIds": [
+                        "/providers/microsoft.authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7"
+                    ],
+                    "conflictEffect": "audit",
+                    "operations": [
+                        {
+                            "operation": "addOrReplace",
+                            "field": "Microsoft.Network/virtualNetworks/dhcpOptions.dnsServers[*]",
+                            "value": "[parameters('allowedDns')]"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
